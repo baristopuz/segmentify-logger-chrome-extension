@@ -1,7 +1,11 @@
 # segmentify-logger-chrome-extension
 segmentify-logger-chrome-extension
 
-chrome://extensions/
-Geliştiri Modu Aktif Olmalı!
+Dosyaları Yeşil Code Butonundan "Download Zip" butonuna tıklayarak indirin. İndirilen klasörü silmeyeceğiniz bir yere taşıyın(Chrome bu klasörden uzantıyı çalıştıracak).
 
-Ayarlar -> Uzantılar -> Paketlenmemiş Öğe Yükle -> segmentify-logger-chrome-extension klasörünü seçin.
+Uzantılar bölümüne ilerleyin.
+Link ile ilerle: chrome://extensions/
+Adım adım ilerle: Üç Nokta -> Ayarlar -> Uzantılar
+
+Geliştirici modunu aktif edin ardından yeni butonlar görünür olacaktır.
+Paketlenmemiş Öğe Yükle -> İndirip klasöre çıkarttığınız uzantı klasörünün içerisini açın ve adımı tamamlayın.
