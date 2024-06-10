@@ -11,14 +11,13 @@ let SegmentifyLoggerExtension = {
 
     createPopupElements: function () {
         let self = SegmentifyLoggerExtension;
-        // Create Popup Element
+        
         let popup = document.createElement('div');
         popup.classList.add("segmentify_logger_extension_popup");
 
         let popupContent = document.createElement('div');
         popupContent.classList.add('segmentify_logger_extension_popup-content');
 
-        // Create Close Button
         let closeButton = document.createElement('button');
         closeButton.classList.add('segmentify_logger_extension_popup-close-btn');
         closeButton.textContent = '×';
@@ -27,13 +26,11 @@ let SegmentifyLoggerExtension = {
         });
         popup.appendChild(closeButton);
 
-        // Create Title Element
         let title = document.createElement('h3');
         title.textContent = 'Segmentify Requests';
         title.classList.add('segmentify_logger_extension_popup-title')
         popup.appendChild(title);
 
-        // Create minimize button
         let minimizeButton = document.createElement('button');
         minimizeButton.textContent = '−';
         minimizeButton.classList.add('segmentify_logger_extension_popup-minimize-btn')
@@ -52,11 +49,9 @@ let SegmentifyLoggerExtension = {
                 isMinimized = true;
             }
 
-            // Popup'ın durumunu local storage'a kaydet
             localStorage.setItem('segmentify_popup_state', isMinimized ? 'minimized' : 'expanded');
         });
 
-        // Popup'ın durumunu local storage'dan al ve buna göre boyutlandır
         let storedState = localStorage.getItem('segmentify_popup_state');
         if (storedState === 'minimized') {
             popup.style.width = '260px';
@@ -67,7 +62,6 @@ let SegmentifyLoggerExtension = {
 
         popup.appendChild(minimizeButton);
 
-        // Create the filter input
         let filterDiv = document.createElement('div');
         filterDiv.style.position = 'relative';
 
@@ -78,21 +72,17 @@ let SegmentifyLoggerExtension = {
         filterDiv.appendChild(filterInput);
         popupContent.appendChild(filterDiv);
 
-        // Create the filter container
         let filterContainer = document.createElement('div');
         filterContainer.classList.add('segmentify_logger_extension_popup-filter-container')
         popupContent.appendChild(filterContainer);
 
-        // Filter options
         let filterOptions = ['PAGE_VIEW', 'PRODUCT_VIEW', 'BASKET_OPERATIONS', 'CHECKOUT', 'CUSTOM_EVENT', 'INTERACTION', 'SEARCH'];
 
-        // Load saved filter settings
         self.config.savedFilters = JSON.parse(localStorage.getItem('segmentify_filters')) || filterOptions.reduce((acc, option) => {
             acc[option] = true;
             return acc;
         }, {});
 
-        // Create checkboxes for filter options
         filterOptions.forEach(function (option) {
             let div = document.createElement('div');
             div.classList.add('checkbox-wrapper-2');
@@ -127,7 +117,6 @@ let SegmentifyLoggerExtension = {
 
         popup.appendChild(popupContent);
 
-        // Append the popup to the body
         document.body.appendChild(popup);
         self.config.filterInput = filterInput;
         self.config.requestList = requestList;
@@ -138,7 +127,6 @@ let SegmentifyLoggerExtension = {
     addStyles: function () {
         let self = SegmentifyLoggerExtension;
 
-        // Add CSS to make summary background red on hover
         let style = document.createElement('style');
         style.textContent = `
        .segmentify_logger_extension_popup {
@@ -382,12 +370,9 @@ let SegmentifyLoggerExtension = {
     watchRequests: function () {
         let self = SegmentifyLoggerExtension;
 
-        // start
-
         // Intercept and log XHR self.config.requests to segmentify.com
         let originalXHROpen = XMLHttpRequest.prototype.open;
         let originalXHRSend = XMLHttpRequest.prototype.send;
-
 
         XMLHttpRequest.prototype.open = function (method, url) {
             this.isSegmentifyRequest = url.includes('segmentify.com');
@@ -455,10 +440,7 @@ let SegmentifyLoggerExtension = {
             originalXHRSend.apply(this, arguments);
         };
 
-        // Add event listener to filter input
         self.config.filterInput.addEventListener('input', self.updateRequestListBox);
-        // enc
-
     },
 
     syntaxHighlight(json) {
@@ -467,10 +449,8 @@ let SegmentifyLoggerExtension = {
         }
         json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-        // Check if JSON contains any of the specified keys
         let hasKeys = /("name":|"category":|"subCategory":|"productId":|"userId":|"sessionId":|"type":)/.test(json);
 
-        // Highlighting JSON content
         json = json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
             let cls = 'number';
             if (/^"/.test(match)) {
@@ -485,7 +465,6 @@ let SegmentifyLoggerExtension = {
                 cls = 'null';
             }
 
-            // If JSON contains any of the specified keys and this match is one of them, set background color to black
             if (hasKeys && (match.includes('"productId"') || match.includes('"category"') || match.includes('"subCategory"') || match.includes('"userId"') || match.includes('"sessionId"') || match.includes('"name"') || match.includes('"type"'))) {
                 return '<span style="background-color: black; color: white;">' + match + '</span>';
             } else {
@@ -508,10 +487,8 @@ let SegmentifyLoggerExtension = {
     activeDragDrop: function () {
         let self = SegmentifyLoggerExtension;
 
-        // Drag Drop
         const draggable = document.querySelector(".segmentify_logger_extension_popup");
         const ignoreElements = document.querySelectorAll(".segmentify_logger_extension_popup ul, .segmentify_logger_extension_popup .segmentify_logger_extension_popup-minimize-btn, .segmentify_logger_extension_popup .segmentify_logger_extension_popup-close-btn");
-
 
         let offsetX = 0, offsetY = 0;
         let isDragging = false;
@@ -520,7 +497,6 @@ let SegmentifyLoggerExtension = {
             if (self.isIgnoreElement(e.target, ignoreElements)) {
                 return;
             }
-            // Sürükleme başlatıldı
             isDragging = true;
             offsetX = e.clientX - draggable.getBoundingClientRect().left;
             offsetY = e.clientY - draggable.getBoundingClientRect().top;
@@ -529,14 +505,12 @@ let SegmentifyLoggerExtension = {
 
         document.addEventListener("mousemove", function (e) {
             if (isDragging) {
-                // Elemanı yeni konumuna taşımak
                 draggable.style.left = e.clientX - offsetX + "px";
                 draggable.style.top = e.clientY - offsetY + "px";
             }
         });
 
         document.addEventListener("mouseup", function () {
-            // Sürükleme sonlandırıldı
             isDragging = false;
             draggable.style.cursor = "pointer";
         });
