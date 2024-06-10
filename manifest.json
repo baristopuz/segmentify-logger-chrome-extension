@@ -1,0 +1,40 @@
+{
+    "manifest_version": 3,
+    "name": "Segmentify Logger",
+    "version": "1.0",
+    "description": "Log Segmentify requests and display them in a popup with filtering options.",
+    "permissions": [
+        "scripting",
+        "storage",
+        "tabs",
+        "activeTab"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content-script.js"
+            ],
+            "run_at": "document_start"
+        }
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "action": {
+        "default_popup": "popup.html",
+        "default_title": "Segmentify Logger"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "injected-script.js"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ]
+}

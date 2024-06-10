@@ -1,0 +1,97 @@
+body {
+  display: flex;
+  min-width: auto;
+  flex-direction: column;
+  min-width: 300px;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  font-family: "Arial", font-family;
+  padding-bottom: 60px;
+}
+
+h1 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+p {
+  font-size: 1rem;
+  margin: 0.5rem 0;
+}
+
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+}
+
+.slider::before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+}
+
+input:checked + .slider {
+  background-color: #2196f3;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px); /* Move the slider to the right when checked */
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round::before {
+  border-radius: 50%;
+}
+
+.secret {
+  margin: 5px;
+}
+
+.sgm-ext-footer {
+  position: fixed;
+  bottom: -2px;
+  height: 42px;
+  left: 0;
+  width: 100%;
+  border-top: 1px solid #e9e9e9;
+  background-color: #f8f9fc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sgm-ext-footer img{
+  width: 127px;
+  height: 26px;
+}
