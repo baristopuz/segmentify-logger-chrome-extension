@@ -602,7 +602,7 @@ SegmentifyLoggerExtension.addResponseToPopup = function (url, responseText) {
 
             // Create a new pre element to display the filtered params
             let pre = document.createElement('pre');
-            pre.textContent = JSON.stringify(filteredParams, null, 2);
+            pre.innerHTML = this.syntaxHighlight(JSON.stringify(filteredParams, null, 2));
 
             details.appendChild(summary);
             details.appendChild(pre);
