@@ -11,7 +11,7 @@ let SegmentifyLoggerExtension = {
 
     createPopupElements: function () {
         let self = SegmentifyLoggerExtension;
-        
+
         let popup = document.createElement('div');
         popup.classList.add("segmentify_logger_extension_popup");
 
@@ -76,7 +76,7 @@ let SegmentifyLoggerExtension = {
         filterContainer.classList.add('segmentify_logger_extension_popup-filter-container')
         popupContent.appendChild(filterContainer);
 
-        let filterOptions = ['PAGE_VIEW', 'PRODUCT_VIEW', 'BASKET_OPERATIONS', 'CHECKOUT', 'CUSTOM_EVENT', 'INTERACTION', 'SEARCH'];
+        let filterOptions = ['PAGE_VIEW', 'PRODUCT_VIEW', 'BASKET_OPERATIONS', 'CHECKOUT', 'CUSTOM_EVENT', 'INTERACTION', 'SEARCH', 'RESPONSE'];
 
         self.config.savedFilters = JSON.parse(localStorage.getItem('segmentify_filters')) || filterOptions.reduce((acc, option) => {
             acc[option] = true;
@@ -109,11 +109,19 @@ let SegmentifyLoggerExtension = {
             label.appendChild(span);
             div.appendChild(label);
             filterContainer.appendChild(div);
+
+            let responseCheckbox = document.createElement('input');
+            responseCheckbox.type = 'checkbox';
+            responseCheckbox.classList.add('ikxBAC');
         });
 
         let requestList = document.createElement('ul');
         requestList.classList.add('segmentify_logger_extension_popup-request-list')
         popupContent.appendChild(requestList);
+
+        let responseList = document.createElement('ul');
+        responseList.classList.add('segmentify_logger_extension_popup-response-list')
+        popupContent.appendChild(responseList);
 
         popup.appendChild(popupContent);
 
@@ -241,6 +249,7 @@ let SegmentifyLoggerExtension = {
            margin: 0;
            position: relative;
            width: 30px;
+           background-image:none;
        }
        
        .segmentify_logger_extension_popup .checkbox-wrapper-2 .ikxBAC::before {
@@ -344,7 +353,6 @@ let SegmentifyLoggerExtension = {
         self.config.requestList.innerHTML = '';
         self.config.requests.forEach(function (request) {
             if (request.instanceId.toLowerCase().includes(filter)) {
-                console.log(request);
                 self.config.requestList.appendChild(request.element);
             }
         });
@@ -433,6 +441,15 @@ let SegmentifyLoggerExtension = {
                         self.updateRequestListBox();
                         self.updateRequestList();
                     }
+
+                    this.addEventListener('load', function () {
+                        try {
+                            SegmentifyLoggerExtension.addResponseToPopup(this.responseURL, this.responseText);
+
+                        } catch (e) {
+                            console.error('Failed to log response:', e);
+                        }
+                    });
                 } catch (e) {
                     console.error('Failed to parse payload:', e);
                 }
@@ -545,6 +562,58 @@ let SegmentifyLoggerExtension = {
         SegmentifyLoggerExtension.waitForDependencies();
     }
 };
+
+SegmentifyLoggerExtension.addResponseToPopup = function (url, responseText) {
+    try {
+        let jsonResponse = JSON.parse(responseText);
+
+        // Filtreleme işlemi: Her response içindeki objeleri kontrol et
+        let recommendProductsResponses = jsonResponse.responses
+            .flatMap(response => {
+                // Eğer response bir dizi ise
+                if (Array.isArray(response)) {
+                    // İçindeki objeleri kontrol et
+                    return response.filter(item => item.type === "recommendProducts");
+                }
+                return [];
+            });
+
+        if (recommendProductsResponses.length === 0) return;
+
+        let responseList = document.querySelector('.segmentify_logger_extension_popup-response-list');
+        if (!responseList) {
+            responseList = document.createElement('ul');
+            responseList.classList.add('segmentify_logger_extension_popup-response-list');
+            SegmentifyLoggerExtension.config.popupElement.appendChild(responseList);
+        }
+
+        recommendProductsResponses.forEach((response, index) => {
+            let li = document.createElement('li');
+            let details = document.createElement('details');
+            let summary = document.createElement('summary');
+            summary.textContent = `RESPONSE(${index}) ->  ` + url;
+
+            let params = response.params || {};
+            let filteredParams = {
+                notificationTitle: params.notificationTitle,
+                instanceId: params.instanceId,
+                recommendedProducts: params.recommendedProducts
+            };
+
+            // Create a new pre element to display the filtered params
+            let pre = document.createElement('pre');
+            pre.textContent = JSON.stringify(filteredParams, null, 2);
+
+            details.appendChild(summary);
+            details.appendChild(pre);
+            li.appendChild(details);
+            responseList.appendChild(li);
+        });
+    } catch (e) {
+        console.error('Failed to parse or log response:', e);
+    }
+};
+
 
 // Initialize SegmentifyLoggerExtension
 SegmentifyLoggerExtension.init();
