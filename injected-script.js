@@ -36,16 +36,19 @@ let SegmentifyLoggerExtension = {
         minimizeButton.classList.add('segmentify_logger_extension_popup-minimize-btn')
         let isMinimized = false;
         let originalHeight = popup.style.maxHeight;
+
         minimizeButton.addEventListener('click', function () {
             if (isMinimized) {
                 popupContent.style.display = 'block';
                 minimizeButton.textContent = '−';
-                popup.style.width = '35vw';
+                popup.classList.remove('popup-minimized');
+                popup.classList.add('popup-show');
                 isMinimized = false;
             } else {
                 popupContent.style.display = 'none';
-                popup.style.width = '260px';
                 minimizeButton.textContent = '+';
+                popup.classList.remove('popup-show');
+                popup.classList.add('popup-minimized');
                 isMinimized = true;
             }
 
@@ -54,7 +57,6 @@ let SegmentifyLoggerExtension = {
 
         let storedState = localStorage.getItem('segmentify_popup_state');
         if (storedState === 'minimized') {
-            popup.style.width = '260px';
             popupContent.style.display = 'none';
             minimizeButton.textContent = '+';
             isMinimized = true;
@@ -76,7 +78,9 @@ let SegmentifyLoggerExtension = {
         filterContainer.classList.add('segmentify_logger_extension_popup-filter-container')
         popupContent.appendChild(filterContainer);
 
-        let filterOptions = ['PAGE_VIEW', 'PRODUCT_VIEW', 'BASKET_OPERATIONS', 'CHECKOUT', 'CUSTOM_EVENT', 'INTERACTION', 'SEARCH', 'RESPONSE'];
+        // let filterOptions = ['PAGE_VIEW', 'INTERACTION'];
+        let filterOptions = ['PAGE_VIEW', 'PRODUCT_VIEW', 'BASKET_OPERATIONS', 'CHECKOUT', 'CUSTOM_EVENT', 'INTERACTION', 'SEARCH'];
+
 
         self.config.savedFilters = JSON.parse(localStorage.getItem('segmentify_filters')) || filterOptions.reduce((acc, option) => {
             acc[option] = true;
@@ -138,19 +142,29 @@ let SegmentifyLoggerExtension = {
         let style = document.createElement('style');
         style.textContent = `
        .segmentify_logger_extension_popup {
-           position: fixed;
-           top: 16px;
-           right: 16px;
-           padding: 16px;
-           border-radius: 8px;
-           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-           background-color: #fff;
-           z-index: 9999999999;
-           width: 35vw;
-           max-height: 70vh;
-           overflow-y: auto;
-           font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: rgba(255,255,255,0.6);
+            backdrop-filter: blur(20px);
+            z-index: 9999999999;
+            max-height: 70vh;
+            overflow-y: auto;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            backdrop-filter: saturate(180%) blur(20px);
+            width: 260px;
        }
+
+        .segmentify_logger_extension_popup.popup-minimized {
+            width: 260px;
+        }
+
+        .segmentify_logger_extension_popup.popup-show {
+            width: 500px;
+        }
        
        .segmentify_logger_extension_popup *{ 
            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"!important;
@@ -165,6 +179,8 @@ let SegmentifyLoggerExtension = {
            color: #999;
            font-size: 24px;
            cursor: pointer;
+           outline:none!important;
+           z-index: 99999;
        }
        
        .segmentify_logger_extension_popup-title {
@@ -186,6 +202,8 @@ let SegmentifyLoggerExtension = {
            color: #999;
            font-size: 24px;
            cursor: pointer;
+           outline:none!important;
+           z-index: 99999;
        }
        
        .segmentify_logger_extension_popup-filter-input {
@@ -197,7 +215,6 @@ let SegmentifyLoggerExtension = {
        }
        
        .segmentify_logger_extension_popup-filter-container {
-           margin-bottom: 16px;
            display: flex;
            gap: 8px;
            flex-wrap: wrap;
@@ -215,11 +232,12 @@ let SegmentifyLoggerExtension = {
            font-weight: 400;
            line-height: 1.5;
            color: #212529;
-           background-color: #fff;
+           background-color: transparent;
            background-clip: padding-box;
            border: 1px solid #ced4da;
            appearance: none;
            border-radius: 4px;
+           border: 1px dashed #000;
            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
        }
        
@@ -313,6 +331,7 @@ let SegmentifyLoggerExtension = {
            padding: 5px;
            margin: 5px;
            overflow-x: auto;
+           font-size: 12px;
        }
        
        .segmentify_logger_extension_popup .string {
@@ -338,7 +357,14 @@ let SegmentifyLoggerExtension = {
        .segmentify_logger_extension_popup summary {
            cursor: pointer;
            padding: 10px;
+           font-size: 13px;
        }
+
+        @media screen and (min-width:1921px) {
+            .segmentify_logger_extension_popup, .segmentify_logger_extension_popup.popup-minimized {
+                width: 450px;
+            }
+        }
        
    `;
 
@@ -409,7 +435,7 @@ let SegmentifyLoggerExtension = {
                             let payloadSummary = document.createElement('summary');
                             let title = '';
                             if (item.name === 'PAGE_VIEW') {
-                                title = `${item.name} - ${item.category}`;
+                                title = `${item.name} - ${item.category} ${(item.subCategory)? `subCat:(${item.subCategory})` : ''}`;
                             } else if (item.name === 'INTERACTION') {
                                 title = `${item.name} - ${item.type} - ${item.instanceId}`;
                             } else if (item.name === 'CUSTOM_EVENT') {
@@ -563,6 +589,7 @@ let SegmentifyLoggerExtension = {
     }
 };
 
+
 SegmentifyLoggerExtension.addResponseToPopup = function (url, responseText) {
     try {
         let jsonResponse = JSON.parse(responseText);
@@ -588,12 +615,23 @@ SegmentifyLoggerExtension.addResponseToPopup = function (url, responseText) {
         }
 
         recommendProductsResponses.forEach((response, index) => {
+            let params = response.params || {};
+
+            let totalObjects = 0;
+            for (const key in params.recommendedProducts) {
+                if (Array.isArray(params.recommendedProducts[key])) {
+                    totalObjects += params.recommendedProducts[key].length;
+                }
+            }
+
             let li = document.createElement('li');
             let details = document.createElement('details');
             let summary = document.createElement('summary');
-            summary.textContent = `RESPONSE(${index}) ->  ` + url;
+            summary.style.backgroundColor = 'rgba(0,0,0,0.2)';
+            summary.style.color = '#000';
+            summary.style.fontSize = '13px';
+            summary.textContent = `Resp: ${params.notificationTitle} (${totalObjects}) -> ${params.instanceId}  `;
 
-            let params = response.params || {};
             let filteredParams = {
                 notificationTitle: params.notificationTitle,
                 instanceId: params.instanceId,
@@ -603,6 +641,9 @@ SegmentifyLoggerExtension.addResponseToPopup = function (url, responseText) {
             // Create a new pre element to display the filtered params
             let pre = document.createElement('pre');
             pre.innerHTML = this.syntaxHighlight(JSON.stringify(filteredParams, null, 2));
+
+            console.log(`%c Kampanya: ${filteredParams.notificationTitle} - (${filteredParams.instanceId})`, 'background: #222; color: #bada55; font-size: 14px;');
+            console.log(filteredParams);
 
             details.appendChild(summary);
             details.appendChild(pre);

@@ -32,15 +32,15 @@ checkbox.addEventListener("change", (event) => {
 // })
 
 // Sayfayı blur etmek için gerekli kod
-// document.addEventListener('DOMContentLoaded', function () {
-//     // Aktif sekmenin içeriğini al
-//     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-//         // Aktif sekmenin body elementini bul ve blur ekleyin
-//         chrome.scripting.executeScript({
-//             target: { tabId: tabs[0].id },
-//             function: () => {
-//                 document.body.style.filter = "blur(4px)";
-//             }
-//         });
-//     });
-// });
+//  document.addEventListener('DOMContentLoaded', function () {
+//       //Aktif sekmenin içeriğini al
+//      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+//           //Aktif sekmenin body elementini bul ve blur ekleyin
+//          chrome.scripting.executeScript({
+//              target: { tabId: tabs[0].id },
+//              function: () => {
+//                  document.body.style.filter = "blur(4px)";
+//              }
+//          });
+//      });
+//  });
