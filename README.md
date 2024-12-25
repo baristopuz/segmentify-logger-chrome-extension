@@ -9,3 +9,5 @@ Adım adım ilerle: Üç Nokta -> Ayarlar -> Uzantılar
 
 Geliştirici modunu aktif edin ardından yeni butonlar görünür olacaktır.
 Paketlenmemiş Öğe Yükle -> İndirip klasöre çıkarttığınız uzantı klasörünün içerisini açın ve adımı tamamlayın.
+
+Ardından Chrome uzantılan bölümünden uzantı simgesine tıklayıp switch butonu ile açıp kapayabilirsiniz.
